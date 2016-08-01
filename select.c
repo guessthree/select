@@ -141,7 +141,6 @@ void echo_srv(int conn)
 
 void handle_sigchld(int sig)
 {
-/*	wait(NULL);*/
 	while (waitpid(-1, NULL, WNOHANG) > 0)
 		;
 }
@@ -153,13 +152,10 @@ void handle_sigpipe(int sig)
 
 int main(void)
 {
-	/*signal(SIGPIPE, SIG_IGN);*/
 	signal(SIGPIPE, handle_sigpipe);
-/*	signal(SIGCHLD, SIG_IGN);*/
 	signal(SIGCHLD, handle_sigchld);
 	int listenfd;
 	if ((listenfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
-/*	if ((listenfd = socket(PF_INET, SOCK_STREAM, 0)) < 0)*/
 		ERR_EXIT("socket");
 
 	struct sockaddr_in servaddr;
@@ -167,8 +163,6 @@ int main(void)
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_port = htons(5188);
 	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	/*servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");*/
-	/*inet_aton("127.0.0.1", &servaddr.sin_addr);*/
 
 	int on = 1;
 	if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0)
@@ -182,29 +176,6 @@ int main(void)
 	struct sockaddr_in peeraddr;
 	socklen_t peerlen;	
 	int conn;
-
-/*
-	pid_t pid;
-	while (1)
-	{
-		if ((conn = accept(listenfd, (struct sockaddr*)&peeraddr, &peerlen)) < 0)
-			ERR_EXIT("accept");
-
-		printf("ip=%s port=%d\n", inet_ntoa(peeraddr.sin_addr), ntohs(peeraddr.sin_port));
-
-		pid = fork();
-		if (pid == -1)
-			ERR_EXIT("fork");
-		if (pid == 0)
-		{
-			close(listenfd);
-			echo_srv(conn);
-			exit(EXIT_SUCCESS);
-		}
-		else
-			close(conn);
-	}
-*/
 
 	int i;
 	int client[FD_SETSIZE]; //支持的最大客户端连接数 数组
